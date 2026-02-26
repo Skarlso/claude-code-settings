@@ -1,6 +1,6 @@
 {
   "name": "claude-code-settings",
-  "version": "2.1.4",
+  "version": "2.1.5",
   "description": "Claude Code settings and skills for spec-driven development workflows",
   "author": {
     "name": "Pengfei Ni",

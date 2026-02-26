@@ -4,7 +4,7 @@
     "name": "Pengfei Ni"
   },
   "metadata": {
-    "version": "2.1.4",
+    "version": "2.1.5",
     "description": "Claude Code settings and skills for spec-driven development workflows"
   },
   "plugins": [
@@ -12,7 +12,7 @@
       "name": "claude-code-settings",
       "source": "./",
       "description": "Claude Code settings, commands, agent and skills (all in one)",
-      "version": "2.1.4",
+      "version": "2.1.5",
       "author": {
         "name": "Pengfei Ni"
       }
