@@ -21,7 +21,20 @@
       "Skill(claude-code-settings:autonomous-skill)",
       "Bash(codex:*)"
     ],
-    "deny": [],
+    "deny": [
+      "Bash(rm -rf:*)",
+      "Bash(rm -fr:*)",
+      "Read(.env)",
+      "Read(.env.*)",
+      "Read(**/.env)",
+      "Read(**/.env.*)",
+      "Read(~/.ssh/**)",
+      "Read(~/.aws/**)",
+      "Read(**/*credential*)",
+      "Read(**/*secret*)",
+      "Read(**/*.pem)",
+      "Read(**/*.key)"
+    ],
     "ask": []
   },
   "statusLine": {
