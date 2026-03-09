@@ -1,6 +1,6 @@
 {
   "name": "nanobanana-skill",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Generate or edit images using Google Gemini API via nanobanana",
   "author": {
     "name": "Pengfei Ni",

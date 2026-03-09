@@ -68,9 +68,8 @@ def main():
     parser.add_argument(
         "--model",
         type=str,
-        default="gemini-3-pro-image-preview",
-        choices=["gemini-3-pro-image-preview", "gemini-2.5-flash-image"],
-        help="Model to use for image generation (default: gemini-3-pro-image-preview)",
+        default="gemini-3.1-flash-image-preview",
+        help="Model to use for image generation (default: gemini-3.1-flash-image-preview)",
     )
     parser.add_argument(
         "--resolution",
@@ -78,6 +77,18 @@ def main():
         default="1K",
         choices=["1K", "2K", "4K"],
         help="Resolution of the generated image (default: 1K)",
+    )
+    parser.add_argument(
+        "--no-search",
+        action="store_true",
+        default=False,
+        help="Disable Google Search grounding (enabled by default)",
+    )
+    parser.add_argument(
+        "--no-think",
+        action="store_true",
+        default=False,
+        help="Disable thinking/reasoning (useful for models that don't support it)",
     )
 
     args = parser.parse_args()
@@ -106,21 +117,24 @@ def main():
         print(f"Generating image (size: {args.size}) with prompt: {args.prompt}")
         contents.append(args.prompt)
 
-    # Generate or edit image with config
+    # Build generation config
+    config_kwargs = {
+        "response_modalities": ["TEXT", "IMAGE"],
+        "image_config": types.ImageConfig(
+            aspect_ratio=aspect_ratio,
+            image_size=args.resolution,
+        ),
+    }
+    if not getattr(args, "no_search", False):
+        config_kwargs["tools"] = [types.Tool(google_search=types.GoogleSearch())]
+    if not getattr(args, "no_think", False):
+        config_kwargs["thinking_config"] = types.ThinkingConfig(include_thoughts=True)
+
+    # Generate or edit image
     response = client.models.generate_content(
         model=args.model,
         contents=contents,
-        config=types.GenerateContentConfig(
-            response_modalities=["TEXT", "IMAGE"],
-            tools=[types.Tool(google_search=types.GoogleSearch())],
-            image_config=types.ImageConfig(
-                aspect_ratio=aspect_ratio,
-                image_size=args.resolution,
-            ),
-            thinking_config=types.ThinkingConfig(
-                include_thoughts=True,
-            ),
-        ),
+        config=types.GenerateContentConfig(**config_kwargs),
     )
 
     if (

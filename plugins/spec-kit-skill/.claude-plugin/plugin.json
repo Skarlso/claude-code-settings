@@ -1,6 +1,6 @@
 {
   "name": "spec-kit-skill",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "GitHub Spec-Kit integration for constitution-based spec-driven development (7-phase workflow)",
   "author": {
     "name": "Pengfei Ni",

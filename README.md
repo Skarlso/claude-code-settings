@@ -1,6 +1,6 @@
-# Claude Code Settings/Commands/Skills for Vibe Coding
+# Claude Code Settings/Skills for Vibe Coding
 
-A curated collection of Claude Code settings, custom commands, skills and sub-agents designed for enhanced development workflows. This setup includes specialized commands, skills and subagents for feature development (spec-driven workflow), code analysis, GitHub integration, and knowledge management.
+A curated collection of Claude Code settings, skills and sub-agents designed for enhanced development workflows. This setup includes specialized skills and subagents for feature development (spec-driven workflow), code analysis, GitHub integration, and knowledge management.
 
 > For OpenAI Codex settings, configurations and custom prompts, please refer [feiskyer/codex-settings](https://github.com/feiskyer/codex-settings).
 
@@ -11,10 +11,10 @@ A curated collection of Claude Code settings, custom commands, skills and sub-ag
 ```sh
 /plugin marketplace add feiskyer/claude-code-settings
 
-# Install main plugin (commands, agents and skills)
+# Install main plugin (skills and agents)
 /plugin install claude-code-settings
 
-# Alternatively, install individual skills without commands/agents
+# Alternatively, install individual skills
 /plugin install codex-skill               # Codex automation
 /plugin install autonomous-skill          # Long-running task automation
 /plugin install nanobanana-skill          # Image generation
@@ -82,55 +82,9 @@ Open the link, log in and authenticate your GitHub Copilot account.
 
    - ANTHROPIC_DEFAULT_HAIKU_MODEL: gpt-5-mini
 
-
-## Commands
-
-The `commands/` directory contains [custom slash commands](https://code.claude.com/docs/en/slash-commands) that extend Claude Code's slash commands, which could be invoked via `/<command-name> [arguments]`.
-
-<details>
-<summary>Analysis & Reflection</summary>
-
-### Analysis & Reflection
-
-- `/think-harder [problem]` - Enhanced analytical thinking
-- `/think-ultra [complex problem]` - Ultra-comprehensive analysis
-- `/reflection` - Analyze and improve Claude Code instructions
-- `/reflection-harder` - Comprehensive session analysis and learning
-- `/eureka [breakthrough]` - Document technical breakthroughs
-
-</details>
-
-<details>
-<summary>GitHub Integration</summary>
-
-### GitHub Integration
-
-- `/gh:review-pr [PR_NUMBER]` - Comprehensive PR review and comments
-- `/gh:fix-issue [issue-number]` - Complete issue resolution workflow
-
-</details>
-
-<details>
-<summary>Documentation & Knowledge</summary>
-
-### Documentation & Knowledge
-
-- `/cc:create-command [name] [description]` - Create new Claude Code commands
-
-</details>
-
-<details>
-<summary>Utilities</summary>
-
-### Utilities
-
-- `/translate [text]` - Translate English/Japanese tech content to Chinese
-
-</details>
-
 ## Skills
 
-Skills are now distributed as separate plugins for modular installation. Install only what you need:
+Skills are [reusable capabilities](https://docs.anthropic.com/en/docs/claude-code/skills) that teach Claude how to complete specific tasks. They can be invoked via `/skill-name [arguments]` or triggered automatically based on context. Install only what you need:
 
 <details>
 <summary>codex-skill - handoff task to Codex CLI</summary>
@@ -370,6 +324,86 @@ Claude: [Automatically uses spec-kit-skill, detects CLI, guides through phases]
 
 </details>
 
+<details>
+<summary>reflection - Session analysis and CLAUDE.md improvement</summary>
+
+### [reflection](./skills/reflection)
+
+Analyze development sessions, capture learnings, and improve Claude Code instructions. Supports two modes:
+
+- **Quick mode** (`/reflection`): Analyzes chat history to identify and implement CLAUDE.md improvements
+- **Deep mode** (`/reflection deep`): Comprehensive session analysis covering problems solved, patterns, user preferences, system understanding, and knowledge gaps
+
+</details>
+
+<details>
+<summary>eureka - Technical breakthrough documentation</summary>
+
+### [eureka](./skills/eureka)
+
+Capture technical breakthroughs and transform them into actionable, reusable documentation. Creates structured breakthrough files in `breakthroughs/` with problem/insight/implementation/impact sections and maintains a searchable index.
+
+**Usage:**
+
+```text
+You: "/eureka Reduced API response time from 2s to 100ms by implementing request batching"
+Claude: [Creates breakthroughs/2025-01-15-api-request-batching.md, updates INDEX.md]
+```
+
+</details>
+
+<details>
+<summary>translate - Tech article translation to Chinese</summary>
+
+### [translate](./skills/translate)
+
+Translate English or Japanese tech articles into natural, fluent Chinese using a three-step process (direct translation, issue identification, reinterpretation). Preserves Markdown formatting and keeps technical terms and brand names untranslated.
+
+**Usage:**
+
+```text
+You: "/translate [paste text or provide file path]"
+Claude: [Outputs polished Chinese translation]
+```
+
+</details>
+
+<details>
+<summary>command-creator - Create Claude Code custom commands</summary>
+
+### [command-creator](./skills/command-creator)
+
+Create Claude Code custom slash commands with proper structure, frontmatter, and best practices.
+
+</details>
+
+<details>
+<summary>github-fix-issue - Fix GitHub issues end-to-end</summary>
+
+### [github-fix-issue](./skills/github-fix-issue)
+
+Fix GitHub issues from analysis through branch creation, implementation, testing, and PR submission.
+
+</details>
+
+<details>
+<summary>github-review-pr - Review GitHub pull requests</summary>
+
+### [github-review-pr](./skills/github-review-pr)
+
+Review GitHub pull requests with detailed, multi-perspective code analysis using parallel subagents with confidence scoring and false positive filtering.
+
+</details>
+
+<details>
+<summary>skill-creator - Create and benchmark agent skills</summary>
+
+### [skill-creator](./skills/skill-creator)
+
+Create, refine, and benchmark agent skills with iterative evaluation loops, quantitative metrics, and description optimization.
+
+</details>
+
 ## Agents
 
 The `agents/` directory contains specialized AI [subagents](https://docs.anthropic.com/en/docs/claude-code/sub-agents) that extend Claude Code's capabilities.
@@ -536,6 +570,7 @@ Ensure the API key you configured in `ANTHROPIC_AUTH_TOKEN` is added to approved
 
 - [Claude Code official document](https://docs.anthropic.com/en/docs/claude-code/overview) - must read official document.
 - [anthropics/skills](https://github.com/anthropics/skills) - official list of Claude Code skills that teach Claude how to complete specific tasks in a repeatable way
+- [anthropics/claude-plugins-official](https://github.com/anthropics/claude-plugins-official) - official list of Claude Code plugins managed by Anthropic
 - [hesreallyhim/awesome-claude-code](https://github.com/hesreallyhim/awesome-claude-code) - curated list of slash-commands, CLAUDE.md files, CLI tools, and other resources.
 - [wshobson/agents](https://github.com/wshobson/agents) - a comprehensive collection of specialized AI subagents for Claude Code.
 

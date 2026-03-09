@@ -1,6 +1,6 @@
 {
   "name": "codex-skill",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Leverage OpenAI Codex (GPT-5/GPT-5.1) for non-interactive automation mode and hands-off task execution",
   "author": {
     "name": "Pengfei Ni",

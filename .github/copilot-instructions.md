@@ -19,75 +19,69 @@ This repository contains Claude Code settings, configurations and guidance. The 
 - Configured to use `claude-sonnet-4.5` as the primary model
 - Telemetry and non-essential traffic are disabled
 
-## Custom Commands
+## Skills
 
-Custom commands for Claude Code are organized in the `commands/` directory by category:
+Skills are reusable capabilities defined in the `skills/` directory. Each skill has a `SKILL.md` file with YAML frontmatter containing `name` and `description` fields. The description serves as both documentation and trigger condition.
 
-### Command File Structure
+### Skill File Structure
 
-All command files must include YAML frontmatter with required metadata:
+All skill files must include YAML frontmatter:
 
 ```yaml
 ---
-description: Brief description of the command
-argument-hint: [expected arguments format]
-allowed-tools: List of tools the command can use
+name: skill-name
+description: 'Comprehensive description that also serves as the trigger condition. Include keywords and phrases that should activate this skill.'
 ---
 ```
-
-**Required fields:**
-
-- `description`: Clear, concise description of command purpose
-- `argument-hint`: Format showing expected arguments (e.g., `[problem or question]`)
-- `allowed-tools`: Comma-separated list of tools (e.g., `Read, Edit, Write, Bash(*)`)
-
-### Command Documentation
-
-- Command documentation belongs in `README.md` under the Commands section
-- Use collapsible `<details>` sections with clear summaries
-- Include usage examples and key features
-- Never document commands within the command files themselves
 
 ### Directory Structure
 
 ```sh
-commands/
-├── cc/          # Claude Code commands
-│   └── create-command.md
-└── gh/          # GitHub commands
-    └── review-pr.md
+skills/
+├── reflection/          # Session analysis and CLAUDE.md improvement
+├── eureka/              # Technical breakthrough documentation
+├── translate/           # Tech article translation to Chinese
+├── command-creator/     # Create Claude Code custom commands
+├── github-fix-issue/    # Fix GitHub issues end-to-end
+├── github-review-pr/    # Review GitHub pull requests
+├── skill-creator/       # Create and benchmark agent skills
+├── codex-skill/         # Handoff tasks to Codex CLI
+├── autonomous-skill/    # Long-running task automation
+├── nanobanana-skill/    # Image generation with Gemini
+├── kiro-skill/          # Interactive feature development
+├── spec-kit-skill/      # Constitution-based development
+├── deep-research/       # Multi-agent research orchestration
+└── youtube-transcribe-skill/  # YouTube transcript extraction
 ```
 
 ### Usage
 
-Run commands using the slash syntax:
+Skills are invoked via slash syntax or triggered automatically:
 
 ```sh
-/[category:][command] [ARGUMENTS]
+/skill-name [arguments]
 ```
 
 **Examples:**
 
-- `/cc:create-command mycommand` - Create a new command
-- `/gh:review-pr 123` - Review pull request #123
+- `/reflection deep` - Comprehensive session analysis
+- `/eureka "Discovered batching optimization"` - Document a breakthrough
+- `/translate [text or file]` - Translate to Chinese
 
-All available commands should be documented at README.md in the Commands section.
+### Skill Development Principles
 
-### Prompt Engineering Principles
+When creating or modifying skills:
 
-When creating or modifying command prompts:
-
-- **Structure prompts systematically**: Use clear phases or sections (e.g., Analysis Phase, Execution Phase)
+- **Comprehensive descriptions**: The `description` field triggers the skill, so include relevant keywords and phrases
+- **Structure content clearly**: Use clear sections with step-by-step instructions
+- **No `$ARGUMENTS`**: Skills receive user input through natural conversation, not via variable substitution
 - **Define specific outputs**: Include explicit output formats and structures
-- **Provide methodical approaches**: Break complex tasks into numbered steps or bullet points
-- **Include meta-cognitive elements**: Add bias awareness, assumption checking, and uncertainty assessment
-- **Balance thoroughness with conciseness**: Aim for comprehensive analysis while maintaining clarity
-- **Use progressive complexity**: Start with simple concepts and build to more complex ones
+- **Keep skills focused**: One skill, one purpose
 
 ### Behavioral Guidelines
 
 - **Concise communication**: Provide direct answers without unnecessary preamble or elaboration
-- **Follow existing patterns**: Always check similar commands for a consistent structure and approach
+- **Follow existing patterns**: Always check similar skills for consistent structure and approach
 - **Prefer editing over creating**: Always edit existing files rather than creating new ones unless absolutely necessary
 - **Use TodoWrite for complex tasks**: Track multistep processes and ensure completion of all requirements
 

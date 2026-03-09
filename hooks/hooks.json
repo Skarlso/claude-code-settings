@@ -1,0 +1,15 @@
+{
+  "description": "Claude Code Settings plugin hooks",
+  "hooks": {
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "${CLAUDE_PLUGIN_ROOT}/skills/autonomous-skill/hooks/stop-hook.sh"
+          }
+        ]
+      }
+    ]
+  }
+}
