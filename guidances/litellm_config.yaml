@@ -1,29 +1,50 @@
 # Disable key per upstream bug https://github.com/BerriAI/litellm/issues/19773.
-# general_settings:
-  # master_key: sk-dummy
+general_settings:
+  master_key: sk-dummy
 litellm_settings:
   drop_params: true
 model_list:
 - model_name: claude-opus-4.6
+  model_info:
+    supports_vision: true
+    max_input_tokens: 128000
+    max_output_tokens: 16384
   litellm_params:
     model: github_copilot/claude-opus-4.6
     drop_params: true
     extra_headers:
       editor-version: "vscode/1.95.0"
       editor-plugin-version: "copilot-chat/0.26.7"
+- model_name: "claude-opus-4.6[1m]"
+  model_info:
+    supports_vision: true
+    max_input_tokens: 1000000
+    max_output_tokens: 16384
+  litellm_params:
+    model: github_copilot/claude-opus-4.6-1m
+    drop_params: true
+    extra_headers:
+      editor-version: "vscode/1.95.0"
+      editor-plugin-version: "copilot-chat/0.26.7"
 - model_name: claude-opus-4.6-fast
+  model_info:
+    supports_vision: true
+    max_input_tokens: 128000
+    max_output_tokens: 16384
   litellm_params:
     model: github_copilot/claude-opus-4.6-fast
     drop_params: true
     extra_headers:
       editor-version: "vscode/1.95.0"
       editor-plugin-version: "copilot-chat/0.26.7"
-- model_name: gpt-5.2-codex
+- model_name: gpt-5.3-codex
   model_info:
     mode: responses
     supports_vision: true
+    max_input_tokens: 128000
+    max_output_tokens: 16384
   litellm_params:
-    model: github_copilot/gpt-5.2-codex
+    model: github_copilot/gpt-5.3-codex
     drop_params: true
     extra_headers:
       editor-version: "vscode/1.95.0"
@@ -32,30 +53,42 @@ model_list:
   model_info:
     mode: responses
     supports_vision: true
+    max_input_tokens: 128000
+    max_output_tokens: 16384
   litellm_params:
     model: github_copilot/gpt-5.2
     drop_params: true
     extra_headers:
       editor-version: "vscode/1.95.0"
       editor-plugin-version: "copilot-chat/0.26.7"
-- model_name: gpt-5.1-codex-max
+- model_name: gpt-5.4
   model_info:
     mode: responses
     supports_vision: true
+    max_input_tokens: 128000
+    max_output_tokens: 16384
   litellm_params:
-    model: github_copilot/gpt-5.1-codex-max
+    model: github_copilot/gpt-5.4
     drop_params: true
     extra_headers:
       editor-version: "vscode/1.95.0"
       editor-plugin-version: "copilot-chat/0.26.7"
-- model_name: claude-opus-4.5
+- model_name: claude-sonnet-4.6
+  model_info:
+    supports_vision: true
+    max_input_tokens: 128000
+    max_output_tokens: 16384
   litellm_params:
-    model: github_copilot/claude-opus-4.5
+    model: github_copilot/claude-sonnet-4.6
     drop_params: true
     extra_headers:
       editor-version: "vscode/1.95.0"
       editor-plugin-version: "copilot-chat/0.26.7"
 - model_name: "*"
+  model_info:
+    supports_vision: true
+    max_input_tokens: 128000
+    max_output_tokens: 16384
   litellm_params:
     model: "github_copilot/*"
     extra_headers:
