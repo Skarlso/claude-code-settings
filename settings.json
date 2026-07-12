@@ -1,16 +1,23 @@
 {
-  "model": "opusplan",
+  "model": "claude-opus-4-6",
+  "defaultMode": "bypassPermissions",
   "env": {
-    "ANTHROPIC_BASE_URL": "http://localhost:4000",
     "ANTHROPIC_AUTH_TOKEN": "sk-dummy",
-    "ANTHROPIC_DEFAULT_OPUS_MODEL": "claude-opus-4.6",
-    "ANTHROPIC_DEFAULT_SONNET_MODEL": "claude-sonnet-4.6",
-    "CLAUDE_CODE_SUBAGENT_MODEL": "claude-sonnet-4.6",
-    "ANTHROPIC_DEFAULT_HAIKU_MODEL": "gpt-5-mini",
+    "ANTHROPIC_BASE_URL": "http://localhost:4141",
+    "ANTHROPIC_DEFAULT_OPUS_MODEL": "claude-opus-4-6",
+    "ANTHROPIC_DEFAULT_SONNET_MODEL": "claude-sonnet-4-6",
+    "CLAUDE_CODE_SUBAGENT_MODEL": "claude-sonnet-4-6",
+    "ANTHROPIC_DEFAULT_HAIKU_MODEL": "claude-haiku-4-5",
     "DISABLE_NON_ESSENTIAL_MODEL_CALLS": "1",
+    "CLAUDE_CODE_EFFORT_LEVEL":"xhigh",
+    "ENABLE_PROMPT_CACHING_1H": "1",
     "DISABLE_TELEMETRY": "1",
+    "ENABLE_TOOL_SEARCH": "true",
+    "DISABLE_ERROR_REPORTING": "1",
     "CLAUDE_CODE_NO_FLICKER": "1",
+    "MAX_THINKING_TOKENS": "31999",
     "CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS": "1",
+    "CLAUDE_CODE_DISABLE_ADAPTIVE_THINKING": "1",
     "CLAUDE_CODE_ATTRIBUTION_HEADER": "0"
   },
   "alwaysThinkingEnabled": true,
@@ -28,7 +35,17 @@
       "Skill(claude-code-settings:youtube-transcribe-skill)",
       "Skill(autonomous-skill)",
       "Skill(claude-code-settings:autonomous-skill)",
-      "Bash(codex:*)"
+      "Bash(codex:*)",
+      "WebFetch(domain:*)",
+      "mcp__plugin_claude-code-setting_chrome",
+      "mcp__plugin_claude-code-settings_chrome__navigate_page",
+      "mcp__plugin_claude-code-settings_chrome__new_page",
+      "mcp__plugin_claude-code-settings_chrome__take_snapshot",
+      "mcp__plugin_claude-code-settings_chrome__fill",
+      "mcp__plugin_claude-code-settings_chrome__press_key",
+      "mcp__plugin_claude-code-settings_chrome__click",
+      "mcp__plugin_claude-code-settings_chrome__evaluate_script",
+      "mcp__plugin_claude-code-settings_chrome__wait_for"
     ],
     "deny": [
       "Bash(rm -rf:*)",
@@ -42,7 +59,9 @@
       "Read(**/*credential*)",
       "Read(**/*secret*)",
       "Read(**/*.pem)",
-      "Read(**/*.key)"
+      "Read(**/*.key)",
+      "Read(~/.zshrc)",
+      "Read(~/.bashrc)"
     ],
     "ask": [
       "Bash(sudo:*)",
@@ -55,7 +74,62 @@
       "Bash(eval:*)"
     ]
   },
-
+  "enabledPlugins": {
+    "claude-code-settings@claude-code-settings": true,
+    "claude-md-management@claude-plugins-official": true,
+    "code-review@claude-plugins-official": true,
+    "code-simplifier@claude-plugins-official": true,
+    "codex-skill@claude-code-settings": true,
+    "codex@openai-codex": true,
+    "commit-commands@claude-plugins-official": true,
+    "context7@claude-plugins-official": true,
+    "document-skills@anthropic-agent-skills": true,
+    "example-skills@anthropic-agent-skills": true,
+    "feature-dev@claude-plugins-official": true,
+    "frontend-design@claude-plugins-official": true,
+    "nanobanana-skill@claude-code-settings": true,
+    "planning-with-files@planning-with-files": true,
+    "plugin-dev@claude-plugins-official": true,
+    "pr-review-toolkit@claude-plugins-official": true,
+    "security-guidance@claude-plugins-official": true,
+    "skill-creator@claude-plugins-official": true,
+    "superpowers@claude-plugins-official": true,
+    "video-skills@video-skills": true,
+    "youtube-transcribe-skill@claude-code-settings": true
+  },
+  "extraKnownMarketplaces": {
+    "anthropic-agent-skills": {
+      "source": {
+        "source": "github",
+        "repo": "anthropics/skills"
+      }
+    },
+    "openai-codex": {
+      "source": {
+        "source": "github",
+        "repo": "openai/codex-plugin-cc"
+      }
+    },
+    "planning-with-files": {
+      "source": {
+        "source": "github",
+        "repo": "OthmanAdi/planning-with-files"
+      }
+    },
+    "video-skills": {
+      "source": {
+        "source": "github",
+        "repo": "feiskyer/video-skills"
+      }
+    },
+    "claude-code-settings": {
+      "source": {
+        "source": "github",
+        "repo": "feiskyer/claude-code-settings"
+      }
+    }
+  },
+  "autoUpdatesChannel": "latest",
   "statusLine": {
     "type": "command",
     "command": "~/.claude/status-line.sh"

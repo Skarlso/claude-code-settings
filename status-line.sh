@@ -50,12 +50,6 @@ MODEL=$(echo "$INPUT" | jq -r '.model.display_name // "unknown"')
 MODEL_ID=$(echo "$INPUT" | jq -r '.model.id // ""')
 CWD=$(echo "$INPUT" | jq -r '.workspace.current_dir // "."')
 
-# Detect 1M context models (Anthropic, Vertex, Bedrock all use "1m" in model ID)
-if echo "$MODEL_ID" | grep -qi '1m'; then
-    CTX_LIMIT=$CTX_LIMIT_1M
-else
-    CTX_LIMIT=$DEFAULT_CTX_LIMIT
-fi
 TRANSCRIPT=$(echo "$INPUT" | jq -r '.transcript_path // ""')
 DIR=$(basename "$CWD")
 
@@ -102,6 +96,38 @@ get_token_metrics() {
 
     total_in=$((in_tok + cache_read + cache_create))
     echo "$total_in $out_tok"
+}
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Context Window Limit
+# ─────────────────────────────────────────────────────────────────────────────
+#
+# The true context-window size is NOT exposed to the status line: the stdin JSON
+# only carries model id/name, and the 1M window is enabled via a beta header, not
+# encoded in the model id (e.g. "claude-opus-4-8" stays the same in 1M mode).
+# So we resolve it in priority order:
+#   1. Explicit override env var (also fixes early-session, pre-200k correctness)
+#   2. Model id literally contains "1m" (some Vertex/Bedrock aliases do)
+#   3. Empirical: a 200k-window model can never carry >200k input tokens in a
+#      single request — so if any usage block ever exceeded 200k, it's a 1M
+#      session. (Robust to compaction, since we scan the whole transcript.)
+
+resolve_ctx_limit() {
+    if [[ -n "${CLAUDE_CONTEXT_LIMIT:-}" ]]; then
+        echo "$CLAUDE_CONTEXT_LIMIT"; return 0
+    fi
+    if echo "$MODEL_ID" | grep -qi '1m'; then
+        echo "$CTX_LIMIT_1M"; return 0
+    fi
+    if [[ -f "$TRANSCRIPT" ]]; then
+        local peak
+        peak=$(grep -oE '"(input_tokens|cache_read_input_tokens|cache_creation_input_tokens)":[0-9]+' "$TRANSCRIPT" 2>/dev/null \
+            | grep -oE '[0-9]+' | awk 'BEGIN{m=0}{if($1>m)m=$1}END{print m+0}')
+        if [[ "${peak:-0}" -gt "$DEFAULT_CTX_LIMIT" ]]; then
+            echo "$CTX_LIMIT_1M"; return 0
+        fi
+    fi
+    echo "$DEFAULT_CTX_LIMIT"
 }
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -192,6 +218,7 @@ main() {
     total_in=${total_in:-0}
     out_tok=${out_tok:-0}
 
+    CTX_LIMIT=$(resolve_ctx_limit)
     ctx_pct=$(awk "BEGIN {printf \"%.1f\", ($total_in / $CTX_LIMIT) * 100}")
     duration=$(get_session_duration)
     cost=$(calculate_cost "$total_in" "$out_tok")
