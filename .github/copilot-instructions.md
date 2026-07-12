@@ -8,15 +8,13 @@ This repository contains Claude Code settings, configurations and guidance. The 
 
 ### Required Dependencies
 
-- `copilot-api`: Install globally with `npm install -g copilot-api`
-- Run `copilot-api start --proxy-env` to authorize GitHub Copilot account
-- Use tmux for session management: `tmux new-session -d -s copilot 'copilot-api start --proxy-env'`
+- `copilot-gateway`: Run with `npx copilot-gateway@latest start --proxy-env` to start the proxy and authorize GitHub Copilot account
+- Use tmux for session management: `tmux new-session -d -s copilot 'npx copilot-gateway@latest start --proxy-env'`
 
 ### Configuration
 
 - `settings.json`: Contains environment variables for API configuration
 - Uses `localhost:4141` as the API base URL
-- Configured to use `claude-sonnet-4.5` as the primary model
 - Telemetry and non-essential traffic are disabled
 
 ## Skills
