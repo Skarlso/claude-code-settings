@@ -14,10 +14,30 @@
 #   Optional:
 #     git       For branch/dirty status (skip if not in a repo)
 #
-#   Built-in (no install needed):
-#     awk, grep, stat, date, basename
-#
 # ─────────────────────────────────────────────────────────────────────────────
+# Data source
+# ─────────────────────────────────────────────────────────────────────────────
+#
+# Everything is read from the stdin JSON that Claude Code passes to statusline
+# commands (requires Claude Code >= 2.1.132 for correct context_window
+# semantics):
+#
+#   context_window.context_window_size   200000, or 1000000 for 1M models
+#                                         (works on 1P/Vertex/Bedrock/proxies —
+#                                         resolved client-side by Claude Code)
+#   context_window.total_input_tokens    current context usage: input tokens
+#                                         incl. cache reads + writes (official
+#                                         used_percentage uses the same
+#                                         input-only formula)
+#   context_window.total_output_tokens   output tokens of most recent response
+#   cost.total_cost_usd                  session cost estimated by Claude Code
+#                                         (provider-aware; replaces any
+#                                         hardcoded price table)
+#   cost.total_duration_ms               wall-clock session duration
+#
+# No transcript parsing: the old grep-the-JSONL approach scanned an
+# uncontracted internal format on every refresh and broke on streaming/partial
+# usage entries.
 
 # ─────────────────────────────────────────────────────────────────────────────
 # Configuration
@@ -26,8 +46,6 @@
 BAR_WIDTH=10
 CONTEXT_WARN_PCT=70
 CONTEXT_CRIT_PCT=90
-DEFAULT_CTX_LIMIT=200000
-CTX_LIMIT_1M=1000000
 
 # Colors (using $'...' for proper escape sequence interpretation)
 C_RESET=$'\033[0m'
@@ -37,20 +55,33 @@ C_BLUE=$'\033[1;34m'
 C_RED=$'\033[0;31m'
 C_YELLOW=$'\033[0;33m'
 C_GREEN=$'\033[0;32m'
-C_MAGENTA=$'\033[0;35m'
 C_DIM=$'\033[2m'
 
 # ─────────────────────────────────────────────────────────────────────────────
-# Input Parsing
+# Input Parsing (single jq pass)
 # ─────────────────────────────────────────────────────────────────────────────
 
-INPUT=$(cat)
+IFS=$'\t' read -r MODEL CWD CTX_USED CTX_OUT CTX_LIMIT COST DURATION_MS < <(
+    jq -r '[
+        (.model.display_name // "unknown"),
+        (.workspace.current_dir // "."),
+        (.context_window.total_input_tokens // 0),
+        (.context_window.total_output_tokens // 0),
+        (.context_window.context_window_size // 200000),
+        (.cost.total_cost_usd // 0),
+        (.cost.total_duration_ms // 0)
+    ] | @tsv'
+)
 
-MODEL=$(echo "$INPUT" | jq -r '.model.display_name // "unknown"')
-MODEL_ID=$(echo "$INPUT" | jq -r '.model.id // ""')
-CWD=$(echo "$INPUT" | jq -r '.workspace.current_dir // "."')
+# Defaults in case jq fails (empty/invalid stdin)
+MODEL=${MODEL:-unknown}
+CWD=${CWD:-.}
+CTX_USED=${CTX_USED:-0}
+CTX_OUT=${CTX_OUT:-0}
+CTX_LIMIT=${CTX_LIMIT:-200000}
+COST=${COST:-0}
+DURATION_MS=${DURATION_MS:-0}
 
-TRANSCRIPT=$(echo "$INPUT" | jq -r '.transcript_path // ""')
 DIR=$(basename "$CWD")
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -75,106 +106,20 @@ get_git_info() {
 }
 
 # ─────────────────────────────────────────────────────────────────────────────
-# Token & Usage Metrics
-# ─────────────────────────────────────────────────────────────────────────────
-
-get_token_metrics() {
-    [[ ! -f "$TRANSCRIPT" ]] && echo "0 0" && return 0
-
-    local in_tok cache_read cache_create out_tok total_in
-
-    in_tok=$(grep -oE '"input_tokens":[0-9]+' "$TRANSCRIPT" 2>/dev/null | grep -oE '[0-9]+' | tail -1)
-    cache_read=$(grep -oE '"cache_read_input_tokens":[0-9]+' "$TRANSCRIPT" 2>/dev/null | grep -oE '[0-9]+' | tail -1)
-    cache_create=$(grep -oE '"cache_creation_input_tokens":[0-9]+' "$TRANSCRIPT" 2>/dev/null | grep -oE '[0-9]+' | tail -1)
-    out_tok=$(grep -oE '"output_tokens":[0-9]+' "$TRANSCRIPT" 2>/dev/null | grep -oE '[0-9]+' | awk '{s+=$1} END {print s+0}')
-
-    # Default to 0 if empty
-    in_tok=${in_tok:-0}
-    cache_read=${cache_read:-0}
-    cache_create=${cache_create:-0}
-    out_tok=${out_tok:-0}
-
-    total_in=$((in_tok + cache_read + cache_create))
-    echo "$total_in $out_tok"
-}
-
-# ─────────────────────────────────────────────────────────────────────────────
-# Context Window Limit
-# ─────────────────────────────────────────────────────────────────────────────
-#
-# The true context-window size is NOT exposed to the status line: the stdin JSON
-# only carries model id/name, and the 1M window is enabled via a beta header, not
-# encoded in the model id (e.g. "claude-opus-4-8" stays the same in 1M mode).
-# So we resolve it in priority order:
-#   1. Explicit override env var (also fixes early-session, pre-200k correctness)
-#   2. Model id literally contains "1m" (some Vertex/Bedrock aliases do)
-#   3. Empirical: a 200k-window model can never carry >200k input tokens in a
-#      single request — so if any usage block ever exceeded 200k, it's a 1M
-#      session. (Robust to compaction, since we scan the whole transcript.)
-
-resolve_ctx_limit() {
-    if [[ -n "${CLAUDE_CONTEXT_LIMIT:-}" ]]; then
-        echo "$CLAUDE_CONTEXT_LIMIT"; return 0
-    fi
-    if echo "$MODEL_ID" | grep -qi '1m'; then
-        echo "$CTX_LIMIT_1M"; return 0
-    fi
-    if [[ -f "$TRANSCRIPT" ]]; then
-        local peak
-        peak=$(grep -oE '"(input_tokens|cache_read_input_tokens|cache_creation_input_tokens)":[0-9]+' "$TRANSCRIPT" 2>/dev/null \
-            | grep -oE '[0-9]+' | awk 'BEGIN{m=0}{if($1>m)m=$1}END{print m+0}')
-        if [[ "${peak:-0}" -gt "$DEFAULT_CTX_LIMIT" ]]; then
-            echo "$CTX_LIMIT_1M"; return 0
-        fi
-    fi
-    echo "$DEFAULT_CTX_LIMIT"
-}
-
-# ─────────────────────────────────────────────────────────────────────────────
 # Session Duration
 # ─────────────────────────────────────────────────────────────────────────────
 
-get_session_duration() {
-    [[ ! -f "$TRANSCRIPT" ]] && echo "0m" && return 0
-
-    local start_time now elapsed hours mins
-
-    if [[ "$OSTYPE" == darwin* ]]; then
-        start_time=$(stat -f %B "$TRANSCRIPT" 2>/dev/null || echo 0)
-    else
-        start_time=$(stat -c %W "$TRANSCRIPT" 2>/dev/null || echo 0)
-        [[ "$start_time" == "0" ]] && start_time=$(stat -c %Y "$TRANSCRIPT" 2>/dev/null || echo 0)
-    fi
-
-    [[ -z "$start_time" || "$start_time" -le 0 ]] 2>/dev/null && echo "0m" && return 0
-
-    now=$(date +%s)
-    elapsed=$((now - start_time))
-    hours=$((elapsed / 3600))
-    mins=$(((elapsed % 3600) / 60))
+format_duration() {
+    local ms=$1 mins hours
+    mins=$((ms / 60000))
+    hours=$((mins / 60))
+    mins=$((mins % 60))
 
     if [[ $hours -gt 0 ]]; then
         echo "${hours}h${mins}m"
     else
         echo "${mins}m"
     fi
-}
-
-# ─────────────────────────────────────────────────────────────────────────────
-# Cost Calculation
-# ─────────────────────────────────────────────────────────────────────────────
-
-calculate_cost() {
-    local total_in=$1 out_tok=$2
-    local price_in price_out
-
-    case "$MODEL_ID" in
-        *opus*)   price_in=15;   price_out=75 ;;
-        *haiku*)  price_in=0.25; price_out=1.25 ;;
-        *)        price_in=3;    price_out=15 ;;  # sonnet/default
-    esac
-
-    awk "BEGIN {printf \"%.2f\", ($total_in * $price_in / 1000000) + ($out_tok * $price_out / 1000000)}"
 }
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -190,6 +135,8 @@ build_progress_bar() {
 
     filled=$(awk "BEGIN {printf \"%.0f\", ($pct / 100) * $BAR_WIDTH}")
     filled=${filled:-0}
+    [[ $filled -gt $BAR_WIDTH ]] && filled=$BAR_WIDTH
+    [[ $filled -lt 0 ]] && filled=0
     empty=$((BAR_WIDTH - filled))
 
     # Color based on usage level
@@ -212,25 +159,24 @@ build_progress_bar() {
 # ─────────────────────────────────────────────────────────────────────────────
 
 main() {
-    local total_in out_tok ctx_pct duration cost git_info
+    local ctx_pct duration cost_fmt git_info limit_tag=""
 
-    read -r total_in out_tok <<< "$(get_token_metrics)"
-    total_in=${total_in:-0}
-    out_tok=${out_tok:-0}
-
-    CTX_LIMIT=$(resolve_ctx_limit)
-    ctx_pct=$(awk "BEGIN {printf \"%.1f\", ($total_in / $CTX_LIMIT) * 100}")
-    duration=$(get_session_duration)
-    cost=$(calculate_cost "$total_in" "$out_tok")
+    ctx_pct=$(awk "BEGIN {
+        limit = $CTX_LIMIT; if (limit <= 0) limit = 200000
+        printf \"%.1f\", ($CTX_USED / limit) * 100
+    }")
+    duration=$(format_duration "$DURATION_MS")
+    cost_fmt=$(awk "BEGIN {printf \"%.2f\", $COST}")
     git_info=$(get_git_info)
+    [[ "$CTX_LIMIT" -ge 1000000 ]] && limit_tag=" 1M"
 
-    # Output
-    printf "%b➜%b  %b%s%b%s %b[%s]%b %b[↑%dk/↓%dk \$%s]%b %s %b⏱ %s%b" \
+    # Output: ctx = current context tokens (input+cache), out = last response
+    printf "%b➜%b  %b%s%b%s %b[%s%s]%b %b[ctx %dk/out %dk \$%s]%b %s %b⏱ %s%b" \
         "$C_BOLD_GREEN" "$C_RESET" \
         "$C_CYAN" "$DIR" "$C_RESET" \
         "$git_info" \
-        "$C_DIM" "$MODEL" "$C_RESET" \
-        "$C_DIM" "$((total_in / 1000))" "$((out_tok / 1000))" "$cost" "$C_RESET" \
+        "$C_DIM" "$MODEL" "$limit_tag" "$C_RESET" \
+        "$C_DIM" "$((CTX_USED / 1000))" "$((CTX_OUT / 1000))" "$cost_fmt" "$C_RESET" \
         "$(build_progress_bar "$ctx_pct")" \
         "$C_CYAN" "$duration" "$C_RESET"
 }
