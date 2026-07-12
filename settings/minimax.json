@@ -1,11 +1,11 @@
 {
-  "env":{
-      "ANTHROPIC_BASE_URL": "https://api.minimax.io/anthropic",
-      "ANTHROPIC_AUTH_TOKEN": "<MINIMAX_API_KEY>",
-      "API_TIMEOUT_MS": "3000000",
-      "CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS": "1",
-      "ANTHROPIC_MODEL": "MiniMax-M2",
-      "ANTHROPIC_SMALL_FAST_MODEL": "MiniMax-M2"
+  "env": {
+    "ANTHROPIC_BASE_URL": "https://api.minimax.io/anthropic",
+    "ANTHROPIC_AUTH_TOKEN": "<MINIMAX_API_KEY>",
+    "API_TIMEOUT_MS": "3000000",
+    "CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS": "1",
+    "ANTHROPIC_MODEL": "MiniMax-M2",
+    "ANTHROPIC_SMALL_FAST_MODEL": "MiniMax-M2"
   },
   "alwaysThinkingEnabled": true,
   "permissions": {
@@ -16,8 +16,6 @@
       "Skill(claude-code-settings:nanobanana-skill)",
       "Skill(youtube-transcribe-skill)",
       "Skill(claude-code-settings:youtube-transcribe-skill)",
-      "Skill(autonomous-skill)",
-      "Skill(claude-code-settings:autonomous-skill)",
       "Bash(codex:*)"
     ],
     "deny": [

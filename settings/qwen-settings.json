@@ -16,8 +16,6 @@
       "Skill(claude-code-settings:nanobanana-skill)",
       "Skill(youtube-transcribe-skill)",
       "Skill(claude-code-settings:youtube-transcribe-skill)",
-      "Skill(autonomous-skill)",
-      "Skill(claude-code-settings:autonomous-skill)",
       "Bash(codex:*)"
     ],
     "deny": [

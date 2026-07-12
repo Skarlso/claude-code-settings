@@ -43,7 +43,6 @@ skills/
 ├── github-review-pr/    # Review GitHub pull requests
 ├── skill-creator/       # Create and benchmark agent skills
 ├── codex-skill/         # Handoff tasks to Codex CLI
-├── autonomous-skill/    # Long-running task automation
 ├── nanobanana-skill/    # Image generation with Gemini
 ├── deep-research/       # Multi-agent research orchestration
 └── youtube-transcribe-skill/  # YouTube transcript extraction
