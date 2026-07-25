@@ -65,3 +65,33 @@ codex exec -C ~/projects/backend --full-auto "implement the REST API endpoints f
 ```bash
 codex exec --skip-git-repo-check "analyze the architecture and suggest modernization approach"
 ```
+
+## Adversarial Review (Structured JSON)
+
+**User**: "让 codex 用最挑剔的眼光审查我这次的改动，重点看并发问题"
+
+Read `review-workflows.md` (Adversarial Review) — size the diff with `git diff --shortstat`, assemble the adversarial prompt, then:
+
+```bash
+codex exec -s read-only --output-schema <skill-dir>/assets/review-output.schema.json -o /tmp/codex-review.json "<assembled adversarial prompt>"
+```
+
+Present findings by severity, then stop and ask which to fix — never auto-apply.
+
+## Plan Review (Before Implementation)
+
+**User**: "实现之前，先让 codex 审一遍 tasks/todo.md 里的计划"
+
+Read `review-workflows.md` (Plan Review) — the prompt must state the plan is not yet implemented:
+
+```bash
+codex exec -s read-only "<plan-review prompt referencing tasks/todo.md>"
+```
+
+## Iterative Follow-Up (Resume)
+
+**User**: "不错，让 codex 继续把剩下的测试补完"
+
+```bash
+codex exec resume --last "add the remaining unit tests for the module you just fixed"
+```

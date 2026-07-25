@@ -10,8 +10,8 @@ Codex uses the model configured in `~/.codex/config.toml` by default. Do NOT pas
 # Default: uses model from config.toml (recommended)
 codex exec --full-auto "refactor the payment processing module"
 
-# Only when user specifies a model explicitly:
-codex exec -m gpt-5.2 --full-auto "implement the user authentication feature"
+# Only when user specifies a model explicitly (pass their value through verbatim):
+codex exec -m <model-name> --full-auto "implement the user authentication feature"
 ```
 
 ## Sandbox Modes
@@ -58,8 +58,8 @@ This is the **recommended command for most programming tasks** since it allows c
 Override any `config.toml` value inline with `-c` or `--config`:
 
 ```bash
-# Override model for a single run
-codex exec -c model="o3" --full-auto "implement the feature"
+# Override model for a single run (use the exact value the user asked for)
+codex exec -c model="<model-name>" --full-auto "implement the feature"
 
 # Override sandbox permissions
 codex exec -c 'sandbox_permissions=["disk-full-read-access"]' "analyze all files"
@@ -194,6 +194,14 @@ codex exec resume <session-id> "continue working on the API"
 # Show all sessions (not filtered by current directory)
 codex exec resume --all
 ```
+
+Note: `codex exec resume` rejects `-C`, `-s`, and `--full-auto`. `cd` into the repo first, and pass the sandbox via config override when write access is needed: `codex exec resume --last -c 'sandbox_mode="workspace-write"' "<delta>"`.
+
+Behavioral rules for resuming (cold re-exploration burns tokens on every iteration — resume keeps the thread's context):
+
+- On follow-ups to a prior codex run, send **only the new delta instruction** via `codex exec resume --last "<delta>"` — do not re-send context the session already has.
+- When the user just says "continue" / "keep going", use: `codex exec resume --last "Continue from the current thread state. Pick the next highest-value step and follow through until the task is resolved."`
+- After each run, surface the session id (from the `--json` event stream) and mention `Resume in Codex: codex resume <session-id>` so work can move to the Codex TUI.
 
 ## Open-Source / Local Models
 
