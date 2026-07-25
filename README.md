@@ -107,17 +107,18 @@ Please visit https://github.com/login/device and enter code XXXX-XXXX to authent
 
 ### [codex-skill](./skills/codex-skill)
 
-非交互式自动化模式，使用 OpenAI Codex 完成 Claude 设计好的功能或计划。
+非交互式自动化模式，把编码、代码审查和计划审查交给 OpenAI Codex 完成。
 
-**触发词：** "codex", "use gpt", "gpt-5", "let openai", "full-auto", "用codex", "让gpt实现"
+**触发词：** "codex", "use gpt", "gpt-5", "let openai", "full-auto", "adversarial review", "用codex", "让gpt实现", "对抗式审查", "让codex审查计划", "第二意见"
 
 **核心特性：**
 
 - 多种执行模式（只读、工作区写入、完全访问）
-- 默认使用 `~/.codex/config.toml` 中配置的模型
-- 自主执行无需审批
-- JSON 结构化输出、可恢复会话
-- CLI 完整参考和场景示例见 `references/` 目录
+- 对抗式代码审查（结构化 JSON findings）与实现前的计划审查
+- 审查结果只呈现不自动改码；Codex 调用失败时如实报告而非代答
+- 默认使用 `~/.codex/config.toml` 中配置的模型；非交互、可嵌入自动化流程
+- JSON 结构化输出、增量恢复会话（`resume --last`）
+- Prompt 组合模板、审查工作流、CLI 参考见 `references/` 目录
 
 **依赖：** Codex CLI（`npm i -g @openai/codex` 或 `brew install codex`）
 
@@ -280,7 +281,7 @@ Please visit https://github.com/login/device and enter code XXXX-XXXX to authent
 
 ### [github-review-pr](./skills/github-review-pr)
 
-使用并行子代理进行多角度代码分析，支持置信度评分和误报过滤。
+使用并行子代理进行多角度代码分析（含安全维度），配合对抗式验证——质疑者需在 head SHA 处复读代码、findings 必须附 file:line 与原文引用。支持置信度评分与误报过滤、去重与一致性计数、更新 PR 的增量复审、批量行内评论，干净 PR 自动 LGTM 通过。
 
 </details>
 
