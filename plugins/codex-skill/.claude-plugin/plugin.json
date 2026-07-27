@@ -1,7 +1,7 @@
 {
   "name": "codex-skill",
   "displayName": "Codex Skill",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "description": "Leverage OpenAI Codex for non-interactive automation mode and hands-off task execution",
   "author": {
     "name": "Pengfei Ni",
