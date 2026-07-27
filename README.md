@@ -12,11 +12,24 @@
 
 ## 快速开始
 
+推荐使用 Claude 官方 marketplace 安装，有两种等价方式：
+
+**方式一：在 Claude Code 会话内使用 slash command**
+
 ```sh
 /plugin marketplace add feiskyer/claude-code-settings
 
 # 安装主插件（包含所有技能和代理）
 /plugin install claude-code-settings
+```
+
+**方式二：使用 Claude Code 命令行**
+
+```sh
+claude plugin marketplace add feiskyer/claude-code-settings
+
+# 安装主插件（包含所有技能和代理）
+claude plugin install claude-code-settings@claude-code-settings
 ```
 
 主插件包含的完整技能列表：brainstorming、codex-skill、deep-research、github-fix-issue、github-review-pr、gpt-image-skill、grill-me、handoff、nanobanana-skill、skill-creator、translate、youtube-transcribe-skill，详见[技能列表](#技能列表)。单个技能也可以通过 npx skills 按需安装（见下方其他安装方式）。
@@ -28,7 +41,9 @@
 
 ### npx skills
 
-`npx skills` 可以为你的 AI 编程工具安装技能：
+> **⚠️ 注意：** `npx skills` 安装的技能版本可能滞后于本仓库最新版本。如需获取最新技能，请优先使用上方的官方 marketplace 方式。
+
+`npx skills` 可以为你的 AI 编程工具按需安装单个技能：
 
 ```sh
 # 列出可用技能
@@ -373,7 +388,7 @@ WebSearch 是 [Anthropic 专有工具](https://docs.anthropic.com/en/docs/agents
 <summary>技能装多少合适？会不会影响性能？</summary>
 
 - 建议精选需要的技能，不要全装。过多技能会增加上下文消耗、降低触发准确度
-- 用 `npx skills add feiskyer/claude-code-settings` 手动选择安装，或用 Plugin 安装后按需禁用
+- 推荐用 Plugin 安装后按需禁用；也可以用 `npx skills add feiskyer/claude-code-settings` 手动挑选（注意该方式版本可能滞后）
 - 如果发现 Claude 响应变慢或触发错误的技能，考虑减少已安装数量
 
 </details>
