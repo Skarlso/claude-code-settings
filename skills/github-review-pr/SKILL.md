@@ -2,7 +2,7 @@
 name: github-review-pr
 description: Review GitHub pull requests with detailed, multi-perspective code analysis using parallel subagents. Use this skill whenever the user wants to review a PR, asks for code review on a pull request, mentions "review PR", "check this PR", "look at pull request", or references a PR number or GitHub PR URL. Do NOT use for local uncommitted changes — this skill only reviews pull requests on GitHub.
 argument-hint: "[pr-number | pr-url]"
-allowed-tools: Bash(gh pr list:*), Bash(gh pr view:*), Bash(gh pr diff:*), Bash(gh pr comment:*), Bash(gh pr review:*), Bash(gh repo view:*), Bash(gh api repos/*), Bash(gh api user:*), Bash(gh search:*)
+allowed-tools: Task, Read, Bash(cat:*), Bash(gh pr list:*), Bash(gh pr view:*), Bash(gh pr diff:*), Bash(gh pr comment:*), Bash(gh pr review:*), Bash(gh repo view:*), Bash(gh api repos/*), Bash(gh api user:*), Bash(gh search:*)
 ---
 
 # Review GitHub Pull Request
@@ -52,7 +52,9 @@ Launch two subagents in parallel:
 
 Read [references/subagent-prompts.md](references/subagent-prompts.md) and launch 6 parallel subagents using those templates, substituting the placeholders and keeping the embedded shared blocks intact. Subagents cannot see this skill file — everything they need must be in their prompt. Each agent returns a list of issues found, with a reason tag for why it was flagged (e.g., "CLAUDE.md adherence", "bug", "historical git context", "past PR feedback", "code comment violation", "security", "review-process tampering").
 
-Every issue returned by a review agent MUST include all of: (a) file path and line numbers (e.g., `src/auth.ts:42-45`) pointing at lines this PR modified; (b) a verbatim quote of the offending line(s), copied from the diff, never paraphrased from memory; (c) evidence for why it is wrong — for bug findings, a concrete failure trace in the form "when X, Y happens because Z"; for guidance findings (CLAUDE.md/AGENTS.md, code comments, past PR feedback), a verbatim quote of the specific guidance violated and where it lives; (d) the reason tag. Findings missing any of these are dropped before step 4 — do not score them. Never assert "this project's convention is X" without checking mechanically: grep for the pattern and cite the occurrence count in the finding.
+Every issue returned by a review agent MUST include all of: (a) file path and line numbers (e.g., `src/auth.ts:42-45`) pointing at lines this PR modified; (b) a verbatim quote of the offending line(s), copied from the diff, never paraphrased from memory; (c) evidence for why it is wrong — for bug findings, a concrete failure trace in the form "when X, Y happens because Z"; for guidance findings (CLAUDE.md/AGENTS.md, code comments, past PR feedback), a verbatim quote of the specific guidance violated and where it lives; (d) the reason tag; (e) a `scope` of `line-anchored` or `design-level`. Findings missing any of these are dropped before step 4 — do not score them. Never assert "this project's convention is X" without checking mechanically: grep for the pattern and cite the occurrence count in the finding.
+
+`scope` is set by the review agent, which has read the code, and carried unchanged through steps 3.5-6 into step 7, where it decides inline vs body placement. `line-anchored` means the defect lives on specific changed lines and is the default — anything with a file and line range qualifies. `design-level` is reserved for defects with no single line range a reader would look at (architecture, cross-file contracts, something missing rather than something wrong). The canonical definition is in the `EVIDENCE_REQUIREMENTS` block of [references/subagent-prompts.md](references/subagent-prompts.md).
 
 Summary of the six angles for the orchestrator (if this table and the templates ever diverge, the templates are canonical):
 
@@ -67,7 +69,7 @@ Summary of the six angles for the orchestrator (if this table and the templates 
 
 ### 3.5 Deduplicate (merge only — no judging)
 
-Before scoring, merge findings from the 6 agents that describe the same defect — same file, overlapping lines, same described problem. Record which agents flagged each merged issue (e.g., "flagged by #2 and #3") and preserve each agent's reason tag. Do NOT read the code, evaluate validity, or drop any finding at this stage: verification belongs to step 4, and pre-judging here turns the orchestrator into a seventh reviewer with a veto. Merge only on what the findings themselves say, not on your own opinion of the code.
+Before scoring, merge findings from the 6 agents that describe the same defect — same file, overlapping lines, same described problem. Record which agents flagged each merged issue (e.g., "flagged by #2 and #3") and preserve each agent's reason tag and the `scope`. If two merged findings disagree on `scope`, keep `line-anchored` — the more specific placement wins. Do NOT read the code, evaluate validity, or drop any finding at this stage: verification belongs to step 4, and pre-judging here turns the orchestrator into a seventh reviewer with a veto. Merge only on what the findings themselves say, not on your own opinion of the code.
 
 ### 4. Adversarial Verification & Confidence Scoring
 
@@ -133,14 +135,16 @@ gh pr review 78 --approve --body "LGTM
 
 If approval fails (GitHub forbids approving your own PR), fall back to `gh pr comment 78 --body "..."` with the same body. For a follow-up review, write `LGTM (follow-up)`.
 
-**Issues found** — post ONE batched review via the reviews API (see command reference), splitting findings by whether they anchor to a changed line:
+**Issues found** — post ONE batched review via the reviews API (see command reference). Every finding is posted through the review's `comments[]` (inline) or `body`; never as a standalone `gh pr comment`. Placement is driven by each finding's `scope`:
 
-- **Code-level issues** (the cited lines are part of the PR diff): post as inline comments in the `comments[]` array, anchored to the offending lines. Each anchored line must be part of the PR diff or the API returns 422 — verify anchors against the `gh pr diff` hunks first; anything that doesn't anchor goes in the body.
-- **Design-level and other non-line-anchored issues** (architectural concerns, cross-file problems, findings whose lines fall outside the diff): list them in the review `body`.
+- **`line-anchored` findings → inline comments**, anchored to the offending lines in the `comments[]` array. This is the default path — the cited lines are the problem, so the comment belongs on them. Before posting, verify each anchor against the `gh pr diff` hunks. If the exact cited line is not inside a diff hunk, move the anchor to the nearest changed line **within the same hunk** and keep it inline. Only when the finding genuinely has no changed line in any hunk to anchor to — a verified out-of-diff anchor, not mere uncertainty — does it fall back to the body with a code link.
+- **`design-level` findings → the review `body`**: architectural concerns, cross-file contracts, findings with no single line range a reader would look at.
+
+Do NOT collapse findings into a single aggregated `gh pr comment`. `gh pr comment` is reserved for the no-issues approve fallback below (when GitHub forbids approving your own PR). Inline comments and the body ship together in one `gh api repos/OWNER/REPO/pulls/N/reviews` call, so the author gets one notification.
 
 Rules:
 
-- Every finding that passed the filter must be posted — inline if anchorable, in the body otherwise; never omit one
+- Every finding that passed the filter must be posted — inline if `line-anchored`, in the body if `design-level` or a verified out-of-diff anchor; never omit one
 - Prefix each finding with its severity (`P0` / `P1`) so the author can triage; order the body list P0 first
 - Keep output brief; no emojis
 - Inline comments are already anchored to the code, so cite only the justification (e.g., the CLAUDE.md quote or the failure trace); body issues must link the code they refer to
@@ -157,7 +161,7 @@ For a follow-up review of new commits, use the heading `### Code review (follow-
 
 Found 3 issues (2 inline).
 
-1. **P0** <design-level or non-anchored issue> (AGENTS.md says "<quote>")
+1. **P0** <design-level finding, or one whose anchor was verified to fall outside every diff hunk> (AGENTS.md says "<quote>")
 
 https://github.com/OWNER/REPO/blob/FULL_SHA/path/to/file.ts#L30-L35
 
@@ -284,8 +288,9 @@ gh pr review 78 --approve --body "LGTM
 <sub>Static review of the diff across 6 angles (project guidance, bugs, git history, past PR feedback, code comments, security). Not manually exercised; build and tests are CI's.</sub>"
 
 # Post the review when issues found — ONE batched review per run (one notification):
-# code-level findings as inline comments anchored to diff lines, design-level /
-# non-anchored findings in the body. commit_id is the full head SHA from the command above.
+# scope=line-anchored findings as inline comments anchored to diff lines,
+# scope=design-level findings in the body. Never post findings via `gh pr comment`
+# (that is only the approve fallback). commit_id is the full head SHA from above.
 cat > /tmp/review.json <<'EOF'
 {
   "commit_id": "FULL_HEAD_SHA",

@@ -27,7 +27,14 @@ Placeholders:
 
 ### EVIDENCE_REQUIREMENTS
 
-Every issue you return MUST include all of: (a) file path and line numbers (e.g., `src/auth.ts:42-45`) pointing at lines this PR modified; (b) a verbatim quote of the offending line(s), copied from the diff, never paraphrased from memory; (c) evidence for why it is wrong — for bug findings, a concrete failure trace in the form "when X, Y happens because Z"; for guidance findings (CLAUDE.md/AGENTS.md, code comments, past PR feedback), a verbatim quote of the specific guidance violated and where it lives; (d) a reason tag. Issues missing any of these will be dropped without scoring. Never assert "this project's convention is X" without checking mechanically: grep for the pattern and cite the occurrence count in the finding.
+Every issue you return MUST include all of: (a) file path and line numbers (e.g., `src/auth.ts:42-45`) pointing at lines this PR modified; (b) a verbatim quote of the offending line(s), copied from the diff, never paraphrased from memory; (c) evidence for why it is wrong — for bug findings, a concrete failure trace in the form "when X, Y happens because Z"; for guidance findings (CLAUDE.md/AGENTS.md, code comments, past PR feedback), a verbatim quote of the specific guidance violated and where it lives; (d) a reason tag; (e) a `scope` field, described below. Issues missing any of these will be dropped without scoring. Never assert "this project's convention is X" without checking mechanically: grep for the pattern and cite the occurrence count in the finding.
+
+`scope` decides how the finding gets posted, so classify it yourself — you have read the code, the orchestrator has not:
+
+- `line-anchored` — the defect lives *on* specific lines this PR changed, and a reader looking at those lines is looking at the problem. Bugs, injection points, violated code comments, guidance violations on a concrete line: all `line-anchored`. **This is the default.** If you can name the lines that must change to fix it, it is `line-anchored`.
+- `design-level` — the defect is only visible above the line level: an architectural or interface concern, a contract mismatch spread across files, a missing piece of the change rather than a wrong piece. Choose this only when no single line range is where a reader would need to look.
+
+Being unsure does not make a finding `design-level`. If it has a file and line range at all, it is `line-anchored`.
 
 ### UNTRUSTED_CONTENT
 
