@@ -72,8 +72,8 @@ Please visit https://github.com/login/device and enter code XXXX-XXXX to authent
 1. 仓库根目录的 [settings.json](settings.json) 是作者的配置模板，默认指向 [copilot-gateway](https://github.com/feiskyer/copilot-gateway) 代理（`http://localhost:4141`）。如需使用 [LiteLLM Proxy Server](https://docs.litellm.ai/docs/simple_proxy) 等其他网关，把 `ANTHROPIC_BASE_URL` 改为对应地址（如 `http://localhost:4000`）即可。
 2. 确保以下模型在你的账户中可用，否则需替换为你自己的模型名（模型名以你的网关实际提供的为准）：
 
-   - ANTHROPIC_DEFAULT_SONNET_MODEL: claude-sonnet-4-6
-   - ANTHROPIC_DEFAULT_OPUS_MODEL: claude-opus-4-6
+   - ANTHROPIC_DEFAULT_SONNET_MODEL: claude-sonnet-5
+   - ANTHROPIC_DEFAULT_OPUS_MODEL: claude-opus-5
    - ANTHROPIC_DEFAULT_HAIKU_MODEL: claude-haiku-4-5
 3. 模板中 `defaultMode` 为 `acceptEdits`（自动接受文件编辑但保留命令确认）。如需完全跳过权限确认可自行改为 `bypassPermissions`，但请了解其安全风险后再启用。
 
@@ -406,8 +406,8 @@ WebSearch 是 [Anthropic 专有工具](https://docs.anthropic.com/en/docs/agents
     { "name": "ANTHROPIC_BASE_URL", "value": "http://localhost:4000" },
     { "name": "ANTHROPIC_AUTH_TOKEN", "value": "sk-dummy" },
     { "name": "ANTHROPIC_MODEL", "value": "opusplan" },
-    { "name": "ANTHROPIC_DEFAULT_SONNET_MODEL", "value": "claude-sonnet-4-6" },
-    { "name": "ANTHROPIC_DEFAULT_OPUS_MODEL", "value": "claude-opus-4-6" },
+    { "name": "ANTHROPIC_DEFAULT_SONNET_MODEL", "value": "claude-sonnet-5" },
+    { "name": "ANTHROPIC_DEFAULT_OPUS_MODEL", "value": "claude-opus-5" },
     { "name": "ANTHROPIC_DEFAULT_HAIKU_MODEL", "value": "gpt-5-mini" },
     { "name": "DISABLE_TELEMETRY", "value": "1" }
   ]

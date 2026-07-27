@@ -1,12 +1,12 @@
 {
-  "model": "claude-opus-4-6",
+  "model": "claude-opus-5",
   "defaultMode": "acceptEdits",
   "env": {
     "ANTHROPIC_AUTH_TOKEN": "sk-dummy",
     "ANTHROPIC_BASE_URL": "http://localhost:4141",
-    "ANTHROPIC_DEFAULT_OPUS_MODEL": "claude-opus-4-6",
-    "ANTHROPIC_DEFAULT_SONNET_MODEL": "claude-sonnet-4-6",
-    "CLAUDE_CODE_SUBAGENT_MODEL": "claude-sonnet-4-6",
+    "ANTHROPIC_DEFAULT_OPUS_MODEL": "claude-opus-5",
+    "ANTHROPIC_DEFAULT_SONNET_MODEL": "claude-sonnet-5",
+    "CLAUDE_CODE_SUBAGENT_MODEL": "claude-sonnet-5",
     "ANTHROPIC_DEFAULT_HAIKU_MODEL": "claude-haiku-4-5",
     "DISABLE_NON_ESSENTIAL_MODEL_CALLS": "1",
     "CLAUDE_CODE_EFFORT_LEVEL": "xhigh",

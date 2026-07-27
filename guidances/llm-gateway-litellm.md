@@ -21,82 +21,60 @@ general_settings:
 litellm_settings:
   drop_params: true
 model_list:
-- model_name: claude-opus-4.6
+- model_name: claude-opus-5
   model_info:
     supports_vision: true
     max_input_tokens: 128000
     max_output_tokens: 16384
   litellm_params:
-    model: github_copilot/claude-opus-4.6
+    model: github_copilot/claude-opus-5
     drop_params: true
     extra_headers:
       editor-version: "vscode/1.95.0"
       editor-plugin-version: "copilot-chat/0.26.7"
-- model_name: "claude-opus-4.6[1m]"
+- model_name: "claude-sonnet-5"
   model_info:
     supports_vision: true
     max_input_tokens: 1000000
     max_output_tokens: 16384
   litellm_params:
-    model: github_copilot/claude-opus-4.6-1m
+    model: github_copilot/claude-sonnet-5
     drop_params: true
     extra_headers:
       editor-version: "vscode/1.95.0"
       editor-plugin-version: "copilot-chat/0.26.7"
-- model_name: claude-opus-4.6-fast
-  model_info:
-    supports_vision: true
-    max_input_tokens: 128000
-    max_output_tokens: 16384
-  litellm_params:
-    model: github_copilot/claude-opus-4.6-fast
-    drop_params: true
-    extra_headers:
-      editor-version: "vscode/1.95.0"
-      editor-plugin-version: "copilot-chat/0.26.7"
-- model_name: gpt-5.3-codex
+- model_name: gpt-5.6-sol
   model_info:
     mode: responses
     supports_vision: true
     max_input_tokens: 128000
     max_output_tokens: 16384
   litellm_params:
-    model: github_copilot/gpt-5.3-codex
+    model: github_copilot/gpt-5.6-sol
     drop_params: true
     extra_headers:
       editor-version: "vscode/1.95.0"
       editor-plugin-version: "copilot-chat/0.26.7"
-- model_name: gpt-5.2
+- model_name: gpt-5.6-luna
   model_info:
     mode: responses
     supports_vision: true
     max_input_tokens: 128000
     max_output_tokens: 16384
   litellm_params:
-    model: github_copilot/gpt-5.2
+    model: github_copilot/gpt-5.6-luna
     drop_params: true
     extra_headers:
       editor-version: "vscode/1.95.0"
       editor-plugin-version: "copilot-chat/0.26.7"
-- model_name: gpt-5.4
+- model_name: gpt-5.6-terra
   model_info:
     mode: responses
     supports_vision: true
     max_input_tokens: 128000
     max_output_tokens: 16384
   litellm_params:
-    model: github_copilot/gpt-5.4
-    drop_params: true
-    extra_headers:
-      editor-version: "vscode/1.95.0"
-      editor-plugin-version: "copilot-chat/0.26.7"
-- model_name: claude-sonnet-4.6
-  model_info:
-    supports_vision: true
-    max_input_tokens: 128000
-    max_output_tokens: 16384
-  litellm_params:
-    model: github_copilot/claude-sonnet-4.6
+    model: github_copilot/gpt-5.6-terra
     drop_params: true
     extra_headers:
       editor-version: "vscode/1.95.0"
@@ -136,8 +114,8 @@ Open the link, login and authenticate your GitHub Copilot account.
   "env": {
     "ANTHROPIC_BASE_URL": "http://localhost:4000",
     "ANTHROPIC_AUTH_TOKEN": "sk-dummy",
-    "ANTHROPIC_MODEL": "claude-opus-4.6[1m]",
-    "ANTHROPIC_DEFAULT_HAIKU_MODEL": "claude-sonnet-4.6",
+    "ANTHROPIC_MODEL": "claude-opus-5[1m]",
+    "ANTHROPIC_DEFAULT_HAIKU_MODEL": "claude-sonnet-5",
     "DISABLE_NON_ESSENTIAL_MODEL_CALLS": "1",
     "DISABLE_TELEMETRY": "1"
   }
@@ -155,10 +133,11 @@ Open another terminal and then run `claude` at your will. DO read its [best prac
 ```sh
 export ANTHROPIC_BASE_URL="http://localhost:4000"
 export ANTHROPIC_AUTH_TOKEN="sk-dummy"
-export ANTHROPIC_MODEL="claude-opus-4.6[1m]"
-export ANTHROPIC_DEFAULT_HAIKU_MODEL="claude-sonnet-4.6"
+export ANTHROPIC_MODEL="claude-opus-5[1m]"
+export ANTHROPIC_DEFAULT_HAIKU_MODEL="claude-sonnet-5"
 export DISABLE_TELEMETRY="1"
 export DISABLE_NON_ESSENTIAL_MODEL_CALLS="1"
 
 claude
 ```
+
