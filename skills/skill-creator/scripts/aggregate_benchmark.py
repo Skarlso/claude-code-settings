@@ -124,13 +124,23 @@ def load_run_results(benchmark_dir: Path) -> dict:
                     continue
 
                 # Extract metrics
+                # Tally from per-expectation verdicts rather than trusting the
+                # grader's own arithmetic; fall back to its summary if absent.
+                expectations = grading.get("expectations", [])
+                summary = grading.get("summary", {})
+                if expectations:
+                    passed = sum(1 for e in expectations if e.get("passed"))
+                    total = len(expectations)
+                else:
+                    passed = summary.get("passed", 0)
+                    total = summary.get("total", 0)
                 result = {
                     "eval_id": eval_id,
                     "run_number": run_number,
-                    "pass_rate": grading.get("summary", {}).get("pass_rate", 0.0),
-                    "passed": grading.get("summary", {}).get("passed", 0),
-                    "failed": grading.get("summary", {}).get("failed", 0),
-                    "total": grading.get("summary", {}).get("total", 0),
+                    "pass_rate": passed / total if total else 0.0,
+                    "passed": passed,
+                    "failed": total - passed,
+                    "total": total,
                 }
 
                 # Extract timing — check grading.json first, then sibling timing.json

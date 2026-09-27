@@ -106,7 +106,7 @@ Write a JSON file with this structure:
     "comparator_reasoning": "Brief summary of why comparator chose winner"
   },
   "winner_strengths": [
-    "Clear step-by-step instructions for handling multi-page documents",
+    "Stated what a correct multi-page result looks like and how to check it",
     "Included validation script that caught formatting errors",
     "Explicit guidance on fallback behavior when OCR fails"
   ],
@@ -135,7 +135,7 @@ Write a JSON file with this structure:
     {
       "priority": "high",
       "category": "instructions",
-      "suggestion": "Replace 'process the document appropriately' with explicit steps: 1) Extract text, 2) Identify sections, 3) Format per template",
+      "suggestion": "Replace 'process the document appropriately' with the goal and quality bar: which sections must survive, what the template requires, and how to verify the result against it",
       "expected_impact": "Would eliminate ambiguity that caused inconsistent behavior"
     },
     {
@@ -147,7 +147,7 @@ Write a JSON file with this structure:
     {
       "priority": "medium",
       "category": "error_handling",
-      "suggestion": "Add fallback instructions: 'If OCR fails, try: 1) different resolution, 2) image preprocessing, 3) manual extraction'",
+      "suggestion": "Explain that OCR can fail on low-quality scans and that the output must still be complete, so the agent looks for another way to get the text instead of giving up",
       "expected_impact": "Would prevent early failure on difficult documents"
     }
   ],

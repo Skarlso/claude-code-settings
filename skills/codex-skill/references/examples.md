@@ -44,7 +44,7 @@ codex exec -i mockup.png --full-auto "implement the UI component matching this d
 
 ## Install Dependencies and Integrate API (Danger-Full-Access)
 
-**User**: "Install the new payment SDK and integrate it"
+**User**: "Install the new payment SDK and integrate it — use danger-full-access, network is fine"
 
 ```bash
 codex exec -s danger-full-access "install the payment SDK dependencies and integrate the API"

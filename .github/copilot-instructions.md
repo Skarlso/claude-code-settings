@@ -42,6 +42,10 @@ skills/
 ├── skill-creator/       # Create and benchmark agent skills
 ├── codex-skill/         # Handoff tasks to Codex CLI
 ├── nanobanana-skill/    # Image generation with Gemini
+├── gpt-image-skill/     # Image generation with OpenAI GPT Image
+├── brainstorming/       # Requirements/design dialogue before building
+├── grill-me/            # Adversarial design interview (manual /grill-me)
+├── handoff/             # Session handoff document (manual /handoff)
 ├── deep-research/       # Multi-agent research orchestration
 └── youtube-transcribe-skill/  # YouTube transcript extraction
 ```
@@ -63,8 +67,8 @@ Skills are invoked via slash syntax or triggered automatically:
 When creating or modifying skills:
 
 - **Comprehensive descriptions**: The `description` field triggers the skill, so include relevant keywords and phrases
-- **Structure content clearly**: Use clear sections with step-by-step instructions
-- **No `$ARGUMENTS`**: Skills receive user input through natural conversation, not via variable substitution
+- **Structure content clearly**: Use clear sections; state the goal, constraints, and how to verify, and reserve numbered steps for sequences where order truly matters (e.g. fragile CLI/browser flows)
+- **Arguments**: Skills can read slash-command input via `$ARGUMENTS`; declare an `argument-hint` in frontmatter when the skill expects one
 - **Define specific outputs**: Include explicit output formats and structures
 - **Keep skills focused**: One skill, one purpose
 

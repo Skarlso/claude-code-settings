@@ -66,9 +66,7 @@ Adapt criteria to the specific task. For example:
 
 For each output (A and B):
 
-1. **Score each criterion** on the rubric (1-5 scale)
-2. **Calculate dimension totals**: Content score, Structure score
-3. **Calculate overall score**: Average of dimension scores, scaled to 1-10
+1. **Score each criterion** on the rubric (1-5 scale), noting the evidence behind each score
 
 ### Step 5: Check Assertions (if provided)
 
@@ -83,7 +81,7 @@ If expectations are provided:
 
 Compare A and B based on (in priority order):
 
-1. **Primary**: Overall rubric score (content + structure)
+1. **Primary**: Which output does better on the rubric criteria, weighting the criteria the task depends on most
 2. **Secondary**: Assertion pass rates (if applicable)
 3. **Tiebreaker**: If truly equal, declare a TIE
 
@@ -112,10 +110,7 @@ Write a JSON file with this structure:
         "organization": 4,
         "formatting": 5,
         "usability": 4
-      },
-      "content_score": 4.7,
-      "structure_score": 4.3,
-      "overall_score": 9.0
+      }
     },
     "B": {
       "content": {
@@ -127,10 +122,7 @@ Write a JSON file with this structure:
         "organization": 3,
         "formatting": 2,
         "usability": 3
-      },
-      "content_score": 2.7,
-      "structure_score": 2.7,
-      "overall_score": 5.4
+      }
     }
   },
   "output_quality": {
@@ -183,11 +175,8 @@ If no expectations were provided, omit the `expectation_results` field entirely.
 - **rubric**: Structured rubric evaluation for each output
   - **content**: Scores for content criteria (correctness, completeness, accuracy)
   - **structure**: Scores for structure criteria (organization, formatting, usability)
-  - **content_score**: Average of content criteria (1-5)
-  - **structure_score**: Average of structure criteria (1-5)
-  - **overall_score**: Combined score scaled to 1-10
 - **output_quality**: Summary quality assessment
-  - **score**: 1-10 rating (should match rubric overall_score)
+  - **score**: 1-10 holistic rating of the output
   - **strengths**: List of positive aspects
   - **weaknesses**: List of issues or shortcomings
 - **expectation_results**: (Only if expectations provided)

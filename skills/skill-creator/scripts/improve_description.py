@@ -174,10 +174,7 @@ def _call_anthropic(prompt: str, model: str | None) -> ProviderResponse:
     response = client.messages.create(
         model=model,
         max_tokens=16000,
-        thinking={
-            "type": "enabled",
-            "budget_tokens": 10000,
-        },
+        thinking={"type": "adaptive", "display": "summarized"},
         messages=[{"role": "user", "content": prompt}],
     )
 

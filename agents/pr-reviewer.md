@@ -53,9 +53,7 @@ Focus your review on:
 ### 4. Provide Feedback
 
 **Review Comments Format:**
-- Focus ONLY on actionable suggestions and improvements
-- DO NOT summarize what the PR does
-- DO NOT provide general commentary
+- Every comment is actionable: a specific issue plus a concrete fix. The author already knows what the PR does, so skip summaries and general commentary.
 - Highlight specific issues with line references
 - Suggest concrete improvements
 

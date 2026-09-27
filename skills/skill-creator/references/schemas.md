@@ -325,10 +325,7 @@ Output from blind comparator. Located at `<grading-dir>/comparison-N.json`.
         "organization": 4,
         "formatting": 5,
         "usability": 4
-      },
-      "content_score": 4.7,
-      "structure_score": 4.3,
-      "overall_score": 9.0
+      }
     },
     "B": {
       "content": {
@@ -340,10 +337,7 @@ Output from blind comparator. Located at `<grading-dir>/comparison-N.json`.
         "organization": 3,
         "formatting": 2,
         "usability": 3
-      },
-      "content_score": 2.7,
-      "structure_score": 2.7,
-      "overall_score": 5.4
+      }
     }
   },
   "output_quality": {
@@ -394,7 +388,7 @@ Output from post-hoc analyzer. Located at `<grading-dir>/analysis.json`.
     "comparator_reasoning": "Brief summary of why comparator chose winner"
   },
   "winner_strengths": [
-    "Clear step-by-step instructions for handling multi-page documents",
+    "Stated what a correct multi-page result looks like and how to check it",
     "Included validation script that caught formatting errors"
   ],
   "loser_weaknesses": [
@@ -418,7 +412,7 @@ Output from post-hoc analyzer. Located at `<grading-dir>/analysis.json`.
     {
       "priority": "high",
       "category": "instructions",
-      "suggestion": "Replace 'process the document appropriately' with explicit steps",
+      "suggestion": "Replace 'process the document appropriately' with the goal and quality bar for the output",
       "expected_impact": "Would eliminate ambiguity that caused inconsistent behavior"
     }
   ],

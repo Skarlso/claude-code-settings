@@ -48,7 +48,7 @@ Thorough testing prevents the fix from introducing new problems:
 
 - Write unit tests that describe the expected behavior
 - Run the full test suite to catch regressions
-- If UI changes were made and browser automation (e.g., Puppeteer MCP) is available, use it to verify visually
+- If UI changes were made and browser automation (e.g., Chrome DevTools MCP) is available, use it to verify visually
 - Fix any failing tests before moving on
 
 ### 6. Open Pull Request

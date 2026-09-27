@@ -6,7 +6,7 @@ allowed-tools: Read, Write, Glob, Grep, Task, Bash(cat:*), Bash(ls:*), Bash(tree
 
 # Codex
 
-You are operating in **codex exec** - a non-interactive automation mode for hands-off task execution.
+This skill delegates work to the OpenAI Codex CLI (`codex exec`), a non-interactive automation mode. You compose the prompt, choose the sandbox level, run the command, and relay Codex's result.
 
 ## Security & Trust Boundaries
 
@@ -40,13 +40,6 @@ Before using this skill, ensure Codex CLI is installed and configured:
 - Prioritize completing the workflow over explaining every step
 - Never escalate the sandbox level, run network/system operations outside the workspace, or touch credentials to "keep going" — pause and ask instead
 - Exception: review tasks follow "Handling Review Results" below — findings are presented, never auto-applied
-
-### Output Behavior
-
-- Stream progress updates as you work
-- Provide a clear, structured final summary upon completion
-- Focus on actionable results and metrics over lengthy explanations
-- Report what was done, not what could have been done
 
 ### Operating Modes
 
@@ -121,36 +114,7 @@ Estimate scope before invoking (`git diff --shortstat` for reviews, task size ot
 
 ## Execution Workflow
 
-1. **Parse the Request**: Understand the complete objective and scope
-2. **Plan Efficiently**: Create a minimal, focused execution plan
-3. **Execute Autonomously**: Implement the solution with confidence
-4. **Verify Results**: Run tests, checks, or validations as appropriate
-5. **Report Clearly**: Provide a structured summary of accomplishments
-
 For iterative follow-ups on the same problem, resume the prior session — `codex exec resume --last "<delta instruction>"` — instead of starting fresh with the full context (see cli-reference.md).
-
-## Best Practices
-
-### Speed and Efficiency
-
-- Make reasonable assumptions when minor details are ambiguous
-- Use parallel operations whenever possible (read multiple files, run multiple commands)
-- Avoid verbose explanations during execution - focus on doing
-- Don't seek confirmation for standard operations
-
-### Scope Management
-
-- Focus strictly on the requested task
-- Don't add unrequested features or improvements
-- Avoid refactoring code that isn't part of the task
-- Keep solutions minimal and direct
-
-### Quality Standards
-
-- Follow existing code patterns and conventions
-- Run relevant tests after making changes
-- Verify the solution actually works
-- Report any errors or limitations encountered
 
 ## Environment Notes
 
@@ -204,12 +168,3 @@ When errors occur:
 2. If codex output shows it could not execute any shell command (sandbox or shell breakage), treat the run as failed — never present it as "no issues found".
 3. If structured output (`--json` / `--output-schema`) fails to parse, show the raw output plus the parse error; do not silently reinterpret it.
 4. For non-blocking errors inside an otherwise successful run, continue with remaining work and report them in the final summary.
-
-## Resumable Execution
-
-If execution is interrupted:
-
-- Clearly state what was completed
-- Provide exact commands/steps to resume
-- List any state that needs to be preserved
-- Explain what remains to be done

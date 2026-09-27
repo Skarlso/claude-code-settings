@@ -236,7 +236,7 @@ Please visit https://github.com/login/device and enter code XXXX-XXXX to authent
 
 ### [translate](./skills/translate)
 
-将英文或日文技术文章翻译为自然流畅的中文。采用三步法（直译、问题识别、意译），保留 Markdown 格式和技术术语原文。
+将英文或日文技术文章翻译为自然流畅的中文。译文忠实原意、读来地道，保留 Markdown 格式和技术术语原文。
 
 **用法：** `/translate [粘贴文本或提供文件路径]`
 
